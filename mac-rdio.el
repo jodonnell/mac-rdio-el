@@ -92,15 +92,33 @@
 (cancel-timer my-timer2)
 
 
+(defun format-track-for-display (track)
+  (concat (track-artist track)
+          " - "
+          (track-album track)
+          " - "
+          (track-name track)))
+
+(defun helm-rdio-search()
+  (mapcar (lambda (track)
+            (cons (format-track-for-display track)
+                  track))
+          song-list))
+
+(defun helm-rdio-actions-for-track (actions track)
+  "Return a list of helm ACTIONS available for this TRACK."
+  `((,(format "Play Track - %s" (track-id track)) . play-track)
+    ("Show Track Metadata" . pp)))
 
 (defvar helm-source-rdio-track-search
   '((name . "Rdio")
     (volatile)
-    (delayed)
-    (multiline)
-    (requires-pattern . 2)
-    (candidates-process . helm-spotify-search)
-    (action-transformer . helm-spotify-actions-for-track)))
+    ;(delayed)
+    ;(multiline)
+    ;(requires-pattern . 0)
+    (candidates . helm-rdio-search)
+    (action-transformer . helm-rdio-actions-for-track)))
+
 
 (require 'helm)
 (defun helm-rdio ()
